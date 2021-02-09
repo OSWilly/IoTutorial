@@ -1,40 +1,25 @@
-/***************************************************
-  Adafruit MQTT Library ESP8266 Example
 
-  Must use ESP8266 Arduino from:
-    https://github.com/esp8266/Arduino
-
-  Works great with Adafruit's Huzzah ESP board & Feather
-  ----> https://www.adafruit.com/product/2471
-  ----> https://www.adafruit.com/products/2821
-
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Tony DiCola for Adafruit Industries.
-  MIT license, all text above must be included in any redistribution
- ****************************************************/
+/************************* Bibliotecas *********************************/
 #include <ESP8266WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 
 /************************* Variaveis *********************************/
 
-const int RELE = 0;                  //Define pino da rele como 0-D3
-const int LED = 2;                //Define pino do led como 2-D4
+const int RELE = 0;                 //Define pino da rele como 0-D3
+const int LED = 2;                  //Define pino do led como 2-D4
 
-/************************* WiFi Access Point *********************************/
+/************************* WiFi *********************************/
 
-#define WLAN_SSID       "NET_2G512C45"
-#define WLAN_PASS       "05512C45"
+#define WLAN_SSID       "SUA INTERNET"
+#define WLAN_PASS       "SENHA DA SUA INTERNET"
 
-/************************* Adafruit.io Setup *********************************/
+/************************* Adafruit.io *********************************/
 
 #define AIO_SERVER      "io.adafruit.com"
 #define AIO_SERVERPORT  1883                   // use 8883 for SSL
-#define AIO_USERNAME    "WillyO"
-#define AIO_KEY         "aio_RGoQ658zoqytBtINd0VvU8WMZL2K"
+#define AIO_USERNAME    "SEU ID ADAFRUIT"
+#define AIO_KEY         "SUA KEY ADAFRUIT"
 
 /************ Global State (you don't need to change this!) ******************/
 
@@ -48,22 +33,16 @@ Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO
 
 /****************************** Feeds ***************************************/
 
-// Setup a feed called 'photocell' for publishing.
-// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
+
 Adafruit_MQTT_Publish luz = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/led");
+Adafruit_MQTT_Subscribe botao = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/rele");
 
-// Setup a feed called 'onoff' for subscribing to changes.
-Adafruit_MQTT_Subscribe botao = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/btn");
-
-/*************************** Sketch Code ************************************/
-
-// Bug workaround for Arduino 1.6.6, it seems to need a function declaration
-// for some reason (only affects ESP8266, likely an arduino-builder bug).
+/*************************** Código ************************************/
 void MQTT_connect();
 
 void setup() {  
-  pinMode(RELE, OUTPUT); //Declara pino da Sala como saída
-  pinMode(LED, OUTPUT); //Declara pino do Quarto como saída
+  pinMode(RELE, OUTPUT); //Declara pino do rele como saída
+  pinMode(LED, OUTPUT);  //Declara pino do led como saída
   
   Serial.begin(115200);
   delay(10);
@@ -86,7 +65,7 @@ void setup() {
   Serial.println("IP address: "); Serial.println(WiFi.localIP());
 
   // Setup MQTT subscription for onoff feed.
-  mqtt.subscribe(&botao); //realiza subscrição no luzmqtt.subscribe(&botao);
+  mqtt.subscribe(&botao); //realiza subscrição
 }
 
 uint32_t x=0;
@@ -118,13 +97,7 @@ void loop() {
                                                           }
                                }
 
-  // ping the server to keep the mqtt connection alive
-  // NOT required if you are publishing once every KEEPALIVE seconds
-  /*
-  if(! mqtt.ping()) {
-    mqtt.disconnect();
-  }
-  */
+
 }}
 
 // Function to connect and reconnect as necessary to the MQTT server.
