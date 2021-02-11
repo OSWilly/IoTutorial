@@ -16,26 +16,23 @@ const int LED = 2;                  //Define pino do led como 2-D4
 
 /************************* Adafruit.io *********************************/
 
-#define AIO_SERVER      "io.adafruit.com"
-#define AIO_SERVERPORT  1883                   // use 8883 for SSL
+#define AIO_SERVER      "io.adafruit.com"      // padrão
+#define AIO_SERVERPORT  1883                   // padrão
 #define AIO_USERNAME    "SEU ID ADAFRUIT"
 #define AIO_KEY         "SUA KEY ADAFRUIT"
 
-/************ Global State (you don't need to change this!) ******************/
+/************ Configuração padrão (não alterar!) ******************/
 
 // Create an ESP8266 WiFiClient class to connect to the MQTT server.
 WiFiClient client;
-// or... use WiFiClientSecure for SSL
-//WiFiClientSecure client;
 
-// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
+// Configurar a classe cliente MQTT informando o cliente WIFI, MQTT server e detalhes de login.
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 
 /****************************** Feeds ***************************************/
 
-
-Adafruit_MQTT_Publish luz = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/led");
-Adafruit_MQTT_Subscribe botao = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/rele");
+Adafruit_MQTT_Publish luz = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/led");          // altere o "led" para o nome do feed que você criou no site do adafruit
+Adafruit_MQTT_Subscribe botao = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/rele");   // altere o "rele" para o nome do feed que você criou no site do adafruit
 
 /*************************** Código ************************************/
 void MQTT_connect();
@@ -49,7 +46,7 @@ void setup() {
 
   Serial.println(F("Adafruit MQTT demo"));
 
-  // Connect to WiFi access point.
+  // Conexão com o WiFi.
   Serial.println(); Serial.println();
   Serial.print("Connecting to ");
   Serial.println(WLAN_SSID);
@@ -64,20 +61,15 @@ void setup() {
   Serial.println("WiFi connected");
   Serial.println("IP address: "); Serial.println(WiFi.localIP());
 
-  // Setup MQTT subscription for onoff feed.
-  mqtt.subscribe(&botao); //realiza subscrição
+  // Configurar as inscrições no MQTT (subscription).
+  mqtt.subscribe(&botao); 
 }
 
 uint32_t x=0;
 
 void loop() {
-  // Ensure the connection to the MQTT server is alive (this will make the first
-  // connection and automatically reconnect when disconnected).  See the MQTT_connect
-  // function definition further below.
+  // Verifica, conecta e reconecta, se necessário, com o MQTT 
   MQTT_connect();
-
-  // this is our 'wait for incoming subscription packets' busy subloop
-  // try to spend your time here
 
   Adafruit_MQTT_Subscribe *subscription;
   while ((subscription = mqtt.readSubscription(5000))) {
@@ -96,16 +88,13 @@ void loop() {
         luz.publish(0);
                                                           }
                                }
-
-
 }}
 
-// Function to connect and reconnect as necessary to the MQTT server.
-// Should be called in the loop function and it will take care if connecting.
+// Função para conectar e reconectar com o MQTT se necessário.
 void MQTT_connect() {
   int8_t ret;
 
-  // Stop if already connected.
+  // Para se já estiver conectado.
   if (mqtt.connected()) {
     return;
   }
@@ -113,14 +102,13 @@ void MQTT_connect() {
   Serial.print("Connecting to MQTT... ");
 
   uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+  while ((ret = mqtt.connect()) != 0) { 
        Serial.println(mqtt.connectErrorString(ret));
        Serial.println("Retrying MQTT connection in 5 seconds...");
        mqtt.disconnect();
        delay(5000);  // wait 5 seconds
        retries--;
        if (retries == 0) {
-         // basically die and wait for WDT to reset me
          while (1);
        }
   }
